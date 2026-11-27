@@ -1,23 +1,13 @@
 FROM node:22-alpine
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install --no-optional
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy source code
 COPY . .
+RUN npm run build && npm prune --omit=dev
 
-# Build the TypeScript code
-RUN npm run build
-
-# Expose the port if needed (for future HTTP server support)
-# EXPOSE 3000
-
-# Set environment variables
 ENV NODE_ENV=production
 
-# Run the server
 CMD ["node", "dist/index.js"]

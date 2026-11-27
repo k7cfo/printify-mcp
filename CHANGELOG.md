@@ -1,37 +1,26 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+## [1.0.0] - 2026-11-27
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### Changed
+- Replaced the `printify-sdk-js` wrapper with a direct client for the current Printify REST API (`https://api.printify.com/v1/`).
+- Authentication is `PRINTIFY_API_TOKEN` from the environment only. The token is not accepted as a tool argument and is redacted from errors and logs. `PRINTIFY_API_KEY` is ignored.
+- Updated the server to MCP SDK 1.32 (`registerTool` / `registerPrompt`).
+- Product create-from-template copies blueprint, print provider, enabled variants, and prices, replaces one print position, and omits read-only fields.
+- Publishing polls `GET` product until `external.handle` is an absolute http(s) URL. `publishing_succeeded` and `publishing_failed` are not called.
+- Unpublish, delete, and archive require `confirm: true`.
+
+### Removed
+- Replicate image generation, Sharp, ImgBB, and the bundled image-generation tools.
+- The mock-shop fallback that hid API failures.
+- The in-tool markdown documentation tool. Printify has no public collections resource, so none is exposed.
 
 ## [0.1.1] - 2025-05-15
 
 ### Fixed
-- Fixed documentation files not being included in the npm package
-- Added build step to copy documentation files to the dist directory
+- Fixed documentation files not being included in the npm package.
 
 ## [0.1.0] - 2025-05-15
 
 ### Added
-- Enhanced defaults management system with `set_default` and `get_defaults` tools
-- Support for setting and using aspect ratio in image generation
-- Improved response formatting to show actual parameters used for generation
-
-### Fixed
-- Fixed bug where aspect ratio settings weren't properly applied
-- Fixed conflict between width/height and aspect ratio parameters
-- Improved handling of default parameters in image generation
-
-## [0.0.1] - 2025-05-01
-
-### Added
-- Initial release of the Printify MCP server
-- Comprehensive integration with Printify API using the official SDK
-- Shop management tools (list shops, switch shops, get status)
-- Product management tools (create, list, update, delete, publish)
-- Blueprint and variant management tools
-- Image upload and management
-- AI image generation using Replicate's Flux 1.1 Pro model
-- Combined workflow for generating and uploading images
-- Detailed documentation and examples
+- Initial Printify MCP server published by TSavo, including shop, product, catalog, and upload tools plus Replicate image generation.

@@ -199,6 +199,30 @@ Publish and wait for the sales channel URL:
 { "tool": "archive_upload", "arguments": { "imageId": "5941187eb8e7e37b3f0e62e5", "confirm": true } }
 ```
 
+## Real-world speed
+
+We built one real product with this server to see what it feels like: a double-sided luggage tag (blueprint 910) for the K7CFO shop, from "pick the blank" to a draft with mockups. It was created unpublished, and nothing was published to the storefront.
+
+One assistant ran every Printify step through the MCP tools: `verify_shop`, `find_products` (duplicate check), `get_blueprint`, `list_blueprint_print_providers`, `get_blueprint_variants` (to read the 960 x 1335 px print area), `upload_image`, `create_product`, `update_product` (price), and `get_product_mockups`. Wall-clock times from a `date +%s` stopwatch:
+
+| Step | Time |
+| --- | --- |
+| Verify shop, duplicate check, read blueprint, providers and print area | about 25 s |
+| Lay out the artwork (photo crop, caption, check by eye) | about 30 s |
+| Upload | about 10 s |
+| Create the draft | about 10 s |
+| Set price from the real cost, fetch and save mockups | about 20 s |
+| **First complete draft, start to saved mockup** | **98 s** |
+
+Those times include the assistant reading tool schemas and deciding what to call next, so they are end-to-end, not raw API latency. The first mockup showed the caption too close to the trimmed edge, so we re-laid the art, re-uploaded and updated the print area. That fix took another 60 s, for 158 s total. Each connector call came back in about a second or two.
+
+How that compares:
+
+- **Raw API scripts.** Earlier the same day, the same assistant did shirt batches with hand-written Python against the REST API. Those runs uploaded 4 images and created 2 products in 21 s, and uploaded 6 images and created 3 products in 23 s (read from the upload and product ID timestamps). So the connector is not faster at the network level. Both talk to the same API. What the connector saves is writing, debugging and re-running a script for each product type, and the built-in `find_products` and `verify_shop` guardrails.
+- **Driving the Printify website in a browser.** We do not have a reliable timed baseline, so we are not claiming a number. The browser path means clicking through the product editor one screen at a time, which is why we only use it for things the API does not offer, such as collections and store navigation.
+
+The honest summary: for a product with a hand-made design, most of the time went into the design, not the Printify calls. Creating the draft and getting mockups back took about 40 seconds.
+
 ## API behavior this server follows
 
 Checked against the live [Printify API reference](https://developers.printify.com/) (the docs page’s own history line still says October 2024; the reference itself now includes decoration methods, economy shipping, GPSR, and mockup selection).
